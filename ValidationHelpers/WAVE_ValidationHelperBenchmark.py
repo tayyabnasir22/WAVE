@@ -4,7 +4,7 @@ from ValidationHelpers.ValidationHelperBase import ValidationHelperBase
 import torch
 from tqdm import tqdm
 
-class Wavelet_ValidationHelperBenchmark(ValidationHelperBase):
+class WAVE_ValidationHelperBenchmark(ValidationHelperBase):
     def __init__(self, patch_size: int, overlap: int, scale: int = 4):
         super().__init__(patch_size, overlap, scale)
 

@@ -20,7 +20,6 @@ class Evaluation:
             data_range=1.0, 
             size_average=True
         )
-
     
     @staticmethod
     def DepthRMSE(a, b, mx, mn, shave_pixels: bool = False):
@@ -48,7 +47,6 @@ class Evaluation:
         b = b * 255.0
         
         return torch.sqrt(torch.mean(torch.pow(a-b,2))).item()
-
 
     def RMSE(a, b, mx = None, mn = None, shave_pixels: bool = False):
         if shave_pixels == True: # This is to be done for validation and testing not training

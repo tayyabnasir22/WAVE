@@ -7,15 +7,15 @@ from Pipelines.Validation.BaseTestingPipeline import BaseTestingPipeline
 from Pipelines.Validation.BaseTestingPipelineBenchmark import BaseTestingPipelineBenchmark
 from Utilities.DirectoryHelper import DirectoryHelper
 from Utilities.Logger import Logger
-from ValidationHelpers.Wavelet_ValidationHelper import Wavelet_ValidationHelper
+from ValidationHelpers.WAVE_ValidationHelper import WAVE_ValidationHelper
 from Validators.BaseValidator import BaseValidator
 import os
 
-class Wavelet_Validator(BaseValidator):
+class WAVE_Validator(BaseValidator):
     def __init__(
             self, 
             model: ModelType, 
-            validation_helper: Wavelet_ValidationHelper,
+            validation_helper: WAVE_ValidationHelper,
             benchmark_type: BenchmarkType):
         model = model
         super().__init__(
