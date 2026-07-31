@@ -9,12 +9,12 @@ def main():
       # TestingOrchestratorWAVE.WAVEValidatorBenchamrk4x(BenchmarkType.MIDDLE)
       # TestingOrchestratorWAVE.WAVEValidatorBenchamrk4x(BenchmarkType.LU)
 
-      # TestingOrchestratorWAVE.WAVEValidator8x(BenchmarkType.DIML)
-      # TestingOrchestratorWAVE.WAVEValidator8x(BenchmarkType.NYUV2)
-      # TestingOrchestratorWAVE.WAVEValidator8x(BenchmarkType.RGBDD)
-      # TestingOrchestratorWAVE.WAVEValidator8x(BenchmarkType.TOFDSRD)
-      # TestingOrchestratorWAVE.WAVEValidatorBenchamrk8x(BenchmarkType.MIDDLE)
-      # TestingOrchestratorWAVE.WAVEValidatorBenchamrk8x(BenchmarkType.LU)
+      TestingOrchestratorWAVE.WAVEValidator8x(BenchmarkType.DIML)
+      TestingOrchestratorWAVE.WAVEValidator8x(BenchmarkType.NYUV2)
+      TestingOrchestratorWAVE.WAVEValidator8x(BenchmarkType.RGBDD)
+      TestingOrchestratorWAVE.WAVEValidator8x(BenchmarkType.TOFDSRD)
+      TestingOrchestratorWAVE.WAVEValidatorBenchamrk8x(BenchmarkType.MIDDLE)
+      TestingOrchestratorWAVE.WAVEValidatorBenchamrk8x(BenchmarkType.LU)
 
       # TestingOrchestratorWAVE.WAVEValidator16x(BenchmarkType.DIDOE)
       TestingOrchestratorWAVE.WAVEValidator16x(BenchmarkType.DIML)
@@ -24,12 +24,12 @@ def main():
       TestingOrchestratorWAVE.WAVEValidatorBenchamrk16x(BenchmarkType.MIDDLE)
       TestingOrchestratorWAVE.WAVEValidatorBenchamrk16x(BenchmarkType.LU)
 
-      # TestingOrchestratorWAVE.WAVEValidator32x(BenchmarkType.DIML)
-      # TestingOrchestratorWAVE.WAVEValidator32x(BenchmarkType.NYUV2)
-      # TestingOrchestratorWAVE.WAVEValidator32x(BenchmarkType.RGBDD)
-      # TestingOrchestratorWAVE.WAVEValidator32x(BenchmarkType.TOFDSRD)
-      # TestingOrchestratorWAVE.WAVEValidatorBenchamrk32x(BenchmarkType.MIDDLE)
-      # TestingOrchestratorWAVE.WAVEValidatorBenchamrk32x(BenchmarkType.LU)
+      TestingOrchestratorWAVE.WAVEValidator32x(BenchmarkType.DIML)
+      TestingOrchestratorWAVE.WAVEValidator32x(BenchmarkType.NYUV2)
+      TestingOrchestratorWAVE.WAVEValidator32x(BenchmarkType.RGBDD)
+      TestingOrchestratorWAVE.WAVEValidator32x(BenchmarkType.TOFDSRD)
+      TestingOrchestratorWAVE.WAVEValidatorBenchamrk32x(BenchmarkType.MIDDLE)
+      TestingOrchestratorWAVE.WAVEValidatorBenchamrk32x(BenchmarkType.LU)
 
 if __name__ == '__main__':
     main()
