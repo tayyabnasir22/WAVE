@@ -22,7 +22,7 @@ If you use this repository or build upon it in your research, please cite the fo
     3. Run the script to begin model training.
 
 ```bash
-python train.py
+python train.py [scale] wave
 ```
 
 ### Testing
@@ -39,8 +39,8 @@ python test.py
 
 The repository includes several configurable components to enable flexible experimentation.
 
-    - Training and evaluation strategies
-    - Datasets
+    - Training and evaluation strategies (classes within Pipeline folders)
+    - Datasets (BenchmarkType class)
 
 ## Saving and Loading Models
 
