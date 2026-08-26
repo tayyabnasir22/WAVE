@@ -19,8 +19,7 @@ If you use this code in your research, **please cite our paper**.
   year    = {2026},
   url     = {https://doi.org/######},
 }
----
-
+```
 
 ## Getting Started
 
