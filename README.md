@@ -9,7 +9,16 @@ If you use this repository or build upon it in your research, please cite the fo
 
 > **WAVE: Reversing the Guidance Hierarchy for Coarse-to-Fine Guided Depth Super-Resolution**
 
+If you use this code in your research, **please cite our paper**.
 
+```bibtex
+@article{nasir2026naimasemanticsawarergb,
+  title   = {WAVE: Reversing the Guidance Hierarchy for Coarse-to-Fine Guided Depth Super-Resolution },
+  author  = {Tayyab Nasir, Daochang Liu, Ajmal Mian},
+  journal = {arXiv},
+  year    = {2026},
+  url     = {https://doi.org/######},
+}
 ---
 
 
@@ -53,3 +62,19 @@ This ensures that each model checkpoint is uniquely identified by its scale, dat
 
 Each training run saves its model weights under a directory name that encodes the full configuration.  
 When performing evaluation, the **same configuration** must be used to correctly locate and load the desired checkpoint.
+
+
+#### Data Processing available at:
+https://github.com/tayyabnasir22/GDSR-Data-Preperation
+
+Also, the code is built on top of the code provided: https://github.com/tayyabnasir22/NAIMA-GDSR
+So if you find this code useful please cite this code/paper as well.
+
+
+**Checkpoints**
+
+Available at: https://drive.google.com/drive/folders/1uY5uzU8AAKafeoN_hbuC3bxVN3WJXhin
+
+## License
+
+See [LICENSE](LICENSE).
