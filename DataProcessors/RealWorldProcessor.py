@@ -8,14 +8,14 @@ class RealWorldProcessor(SRDataProcessorBase):
     def __init__(self, rgb_path: str, depth_path: str, depth_norm_path: str, mask_path: str,
                  min_max_path: str, depth_lr_norm_path: str, repeat: int = 1, augment: bool = False,
                  train: bool = False):
-        self.depths = np.load(depth_path)[:10]
-        self.depths_norm = np.load(depth_norm_path)[:10]
-        self.images = np.load(rgb_path)[:10]
-        self.masks = np.load(mask_path)[:10]
-        self.minmax = np.load(min_max_path)[:10]
+        self.depths = np.load(depth_path)#[:10]
+        self.depths_norm = np.load(depth_norm_path)#[:10]
+        self.images = np.load(rgb_path)#[:10]
+        self.masks = np.load(mask_path)#[:10]
+        self.minmax = np.load(min_max_path)#[:10]
 
         # Real LR depth from the sensor, already normalized with its own min/max
-        self.depths_lr_norm = np.load(depth_lr_norm_path)[:10]
+        self.depths_lr_norm = np.load(depth_lr_norm_path)#[:10]
 
         self.augment = augment
         self.repeat = repeat
