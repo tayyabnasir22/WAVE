@@ -213,7 +213,7 @@ class WAVE(nn.Module):
         # Boundary refinement
         last_token = self.semantics_encoder.forward_features(image)['x_norm_patchtokens']
         B, N, C = last_token.shape
-        H = W = int(N ** 0.5)
+
         last_token = last_token.permute(0,2,1).reshape(B, C, patch_h, patch_w)
         refined, _ = self.boundary_refiner(image, last_token, depth)
         res4 = self.residual4(torch.cat([res4, refined], dim=1))
