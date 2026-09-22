@@ -8,3 +8,6 @@ class BenchmarkType(Enum):
     MIDDLE = "MIDDLE"
     HYPERSIM = "HYPERSIM"
     DIML = "DIML"
+
+    RGBDDReal = 'RGBDDReal'
+    TOFDSRDReal = "TOFDSRDReal"

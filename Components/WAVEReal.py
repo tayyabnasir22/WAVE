@@ -9,8 +9,9 @@ from Components.StructureBlock import StructureBlock
 from Components.DetailBlock import DetailBlock
 from Components.DetailInjector import DetailInjector
 from Components.DBPUpsampling import DBPUpsampling
+import torch.nn.functional as F
 
-class WAVE(nn.Module):
+class WAVEReal(nn.Module):
     def __init__(
             self, 
             use_pretrained: bool, 
@@ -21,11 +22,8 @@ class WAVE(nn.Module):
             kernel_size = 3,
             freeze_dino: bool = True
         ):
-        super(WAVE, self).__init__()
+        super(WAVEReal, self).__init__()
         self.patch_size = patch_size
-
-        # Init processing components
-        self.bicubic = nn.Upsample(scale_factor=scale, mode='bicubic')
 
         self.init_depth_projection = DownsampleX16(1, num_feats)
         
@@ -175,7 +173,11 @@ class WAVE(nn.Module):
         W = image.shape[-1] 
         patch_h, patch_w = H // self.patch_size, W // self.patch_size
 
-        depth_bicubic = self.bicubic(depth)
+        depth_bicubic = F.interpolate(
+            depth,
+            size=image.shape[-2:],
+            mode='bicubic'
+        )
         depth0 = self.init_depth_projection(depth_bicubic)
 
         features = self.semantics_encoder.get_intermediate_layers(image, n=self.intermediate_layer_idx, return_class_token=True)

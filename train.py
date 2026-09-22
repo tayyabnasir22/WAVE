@@ -9,6 +9,7 @@ def main(scale, model):
 
     models = {
         'wave': ModelType.WAVE,
+        'real': ModelType.WAVEReal
     }
 
     TrainingOrchestrator.SCALE = scale
