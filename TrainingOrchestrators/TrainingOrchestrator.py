@@ -1,6 +1,7 @@
 from Models.BenchmarkType import BenchmarkType
 from Models.ModelType import ModelType
 from Trainers.WAVETrainer import WAVETrainer
+from Trainers.RealWorldTrainer import RealWorldTrainer
 
 class TrainingOrchestrator:
     BATCH = 2
@@ -22,6 +23,15 @@ class TrainingOrchestrator:
                 repeat=TrainingOrchestrator.REPEAT,
                 batch_size=TrainingOrchestrator.BATCH,
             ).TrainModel()
+        elif TrainingOrchestrator.MODEL == ModelType.WAVEReal and TrainingOrchestrator.BENCHMARK in [BenchmarkType.TOFDSRDReal, BenchmarkType.RGBDDReal]:
+            RealWorldTrainer(
+                model=TrainingOrchestrator.MODEL,
+                benchmark_type=TrainingOrchestrator.BENCHMARK,
+                input_patch=448,
+                scale=TrainingOrchestrator.SCALE,
+                repeat=TrainingOrchestrator.REPEAT,
+                batch_size=TrainingOrchestrator.BATCH,
+            ).TrainModel()                
         else:
             raise Exception('Not implemented')
             

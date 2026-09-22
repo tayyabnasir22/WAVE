@@ -31,5 +31,8 @@ def main():
       TestingOrchestratorWAVE.WAVEValidatorBenchamrk32x(BenchmarkType.MIDDLE)
       TestingOrchestratorWAVE.WAVEValidatorBenchamrk32x(BenchmarkType.LU)
 
+      TestingOrchestratorWAVE.ValidatorReal(BenchmarkType.RGBDDReal)
+      TestingOrchestratorWAVE.ValidatorReal(BenchmarkType.TOFDSRDReal)
+
 if __name__ == '__main__':
     main()
