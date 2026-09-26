@@ -16,7 +16,6 @@ def main():
       TestingOrchestratorWAVE.WAVEValidatorBenchamrk8x(BenchmarkType.MIDDLE)
       TestingOrchestratorWAVE.WAVEValidatorBenchamrk8x(BenchmarkType.LU)
 
-      # TestingOrchestratorWAVE.WAVEValidator16x(BenchmarkType.DIDOE)
       TestingOrchestratorWAVE.WAVEValidator16x(BenchmarkType.DIML)
       TestingOrchestratorWAVE.WAVEValidator16x(BenchmarkType.NYUV2)
       TestingOrchestratorWAVE.WAVEValidator16x(BenchmarkType.RGBDD)

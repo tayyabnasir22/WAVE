@@ -5,6 +5,7 @@ from Models.RunningAverage import RunningAverage
 from Models.Timer import Timer
 from Pipelines.Validation.BaseTestingPipeline import BaseTestingPipeline
 from Pipelines.Validation.BaseTestingPipelineBenchmark import BaseTestingPipelineBenchmark
+from Pipelines.Validation.RealWorldTestingPipeline import RealWorldTestingPipeline
 from Utilities.DirectoryHelper import DirectoryHelper
 from Utilities.Logger import Logger
 from ValidationHelpers.WAVE_ValidationHelper import WAVE_ValidationHelper
@@ -57,6 +58,15 @@ class WAVE_Validator(BaseValidator):
         if self._benchmark_type in [BenchmarkType.LU, BenchmarkType.MIDDLE]:
             pipeline = BaseTestingPipelineBenchmark(
                  valid_data_path=valid_data_path,
+                model_load_path=model_load_path,
+                model_name=model_name,
+                total_example=total_example,
+                eval_scale=eval_scale,
+                patch_size_valid=None,
+            )
+        elif self._benchmark_type in [BenchmarkType.RGBDDReal, BenchmarkType.TOFDSRDReal]:
+            pipeline = RealWorldTestingPipeline(
+                valid_data_path=valid_data_path,
                 model_load_path=model_load_path,
                 model_name=model_name,
                 total_example=total_example,
