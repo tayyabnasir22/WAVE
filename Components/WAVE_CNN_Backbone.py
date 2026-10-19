@@ -1,14 +1,13 @@
 from Components.BoundaryRefinementBlock import BoundaryRefinementBlock
 from Components.DownsampleX16 import DownsampleX16
-from pytorch_wavelets import DWTForward
 import torch.nn as nn
 import torch
 from Components.DinoV3.Dino3VisionTransformer import Dino3VisionTransformer
 from Components.SToRA import SToRA
-from Components.StructureBlock import StructureBlock
-from Components.DetailBlock import DetailBlock
-from Components.DetailInjector import DetailInjector
+from Components.CNN_GuideBackboneFusion import CNN_GuideBackboneFusion
 from Components.DBPUpsampling import DBPUpsampling
+from Components.CNN_GuideBackbone import CNN_GuideBackbone
+
 
 class WAVE(nn.Module):
     def __init__(
@@ -24,20 +23,14 @@ class WAVE(nn.Module):
         super(WAVE, self).__init__()
         self.patch_size = patch_size
 
-        # Init processing components
         self.bicubic = nn.Upsample(scale_factor=scale, mode='bicubic')
-
         self.init_depth_projection = DownsampleX16(1, num_feats)
-        
         self.upsampler1 = DBPUpsampling(num_feats, num_feats*2, 2)
         self.upsampler2 = DBPUpsampling(num_feats*2, num_feats*3, 2)
         self.upsampler3 = DBPUpsampling(num_feats*3, num_feats*4, 2)
-
         self.final_upscale = DBPUpsampling(num_feats*4, num_feats*4, 2)
 
-        # DINO compoenents
         self.intermediate_layer_idx = [2, 5, 9, 11]
-        
         self.semantics_encoder = Dino3VisionTransformer(
             img_size=img_size,
             embed_dim=384,
@@ -84,28 +77,17 @@ class WAVE(nn.Module):
         self.stora3 = SToRA()
         self.stora4 = SToRA()
 
+        # Guide: conventional fine-to-coarse ResNet pyramid, consumed in reverse
+        self.guide_encoder = CNN_GuideBackbone(
+            num_feats=num_feats, kernel_size=kernel_size
+        )
+        gw = self.guide_encoder.widths  # [H/2: c, H/4: 2c, H/8: 3c, H/16: 4c]
 
-        # Wavelet compoenents
-        self.wavelet_encoder = DWTForward(J=1, wave='haar')
-
-
-        # detail blocks
-        self.deatil_block1 = DetailBlock(384, num_feats)
-        self.deatil_block2 = DetailBlock(384, num_feats*2)
-        self.deatil_block3 = DetailBlock(384, num_feats*3)
-        self.deatil_block4 = DetailBlock(384, num_feats*4)
-
-        # structure blocks
-        self.structure_block1 = StructureBlock(384, num_feats, kernel_size)
-        self.structure_block2 = StructureBlock(384, num_feats*2, kernel_size)
-        self.structure_block3 = StructureBlock(384, num_feats*3, kernel_size)
-        self.structure_block4 = StructureBlock(384, num_feats*4, kernel_size)
-
-        # Gated details injection
-        self.injectors1 = DetailInjector(num_feats, kernel_size)
-        self.injectors2 = DetailInjector(num_feats*2, kernel_size)
-        self.injectors3 = DetailInjector(num_feats*3, kernel_size)
-        self.injectors4 = DetailInjector(num_feats*4, kernel_size)
+        # Fusion blocks: identical CNN_GuideBackboneFusion, only the guide input width changes
+        self.structure_block1 = CNN_GuideBackboneFusion(384, num_feats,   kernel_size, guide_channels=gw[3])  # H/16
+        self.structure_block2 = CNN_GuideBackboneFusion(384, num_feats*2, kernel_size, guide_channels=gw[2])  # H/8
+        self.structure_block3 = CNN_GuideBackboneFusion(384, num_feats*3, kernel_size, guide_channels=gw[1])  # H/4
+        self.structure_block4 = CNN_GuideBackboneFusion(384, num_feats*4, kernel_size, guide_channels=gw[0])  # H/2
 
 
         self.residual1 = nn.Sequential(
@@ -147,28 +129,10 @@ class WAVE(nn.Module):
             
         )
 
-    def dwt_full_pyramid(self, x, level=4, wave='haar'):
-        LLs = []
-        LHs = []
-        HLs = []
-        HHs = []
-        current = x
-        for i in range(level):
-            yl, yh = self.wavelet_encoder(current)
-            # Low-frequency
-            LLs.append(yl) # Saving the input as LL not the output, and last output will be discarded for now TODO may need to change this
-
-            # High-frequency bands
-            y = yh[0]  # (B, C, 3, H, W)
-
-            LHs.append(y[:, :, 0, :, :])
-            HLs.append(y[:, :, 1, :, :])
-            HHs.append(y[:, :, 2, :, :])
-
-            # Next level input
-            current = yl
-
-        return LLs, LHs, HLs, HHs
+    def _refine(self, idx, x):
+        if not self.keep_refiner:
+            return x
+        return getattr(self, f"refiner{idx}")(x)
 
     def forward(self, image, depth):
         H = image.shape[-2] 
@@ -179,35 +143,32 @@ class WAVE(nn.Module):
         depth0 = self.init_depth_projection(depth_bicubic)
 
         features = self.semantics_encoder.get_intermediate_layers(image, n=self.intermediate_layer_idx, return_class_token=True)
-                
-        LLs, LHs, HLs, HHs = self.dwt_full_pyramid(image)
 
-        # HUMMA Block 1        
-        token1 = self.stora1(features[3][0], patch_h, patch_w)        
-        details1 = self.deatil_block1(token1, LHs[3], HLs[3], HHs[3])
-        depth1 = self.structure_block1(token1, LLs[3], depth0)
-        depth1 = self.injectors1(depth1, details1)
+        # Fine-to-coarse CNN hierarchy: G[0] = H/2 ... G[3] = H/16
+        G = self.guide_encoder(image)
+
+        # Block 1 (H/16): coarsest guide feature first
+        token1 = self.stora1(features[3][0], patch_h, patch_w)
+        depth1 = self.structure_block1(token1, G[3], depth0)
+        depth1 = self._refine(1, depth1)
         res1 = self.residual1(self.upsampler1(depth1))
 
-        # HUMMA Block 2
+        # Block 2 (H/8)
         token2 = self.stora2(features[2][0], patch_h, patch_w)
-        details2 = self.deatil_block2(token2, LHs[2], HLs[2], HHs[2])
-        depth2 = self.structure_block2(token2, LLs[2], res1)
-        depth2 = self.injectors2(depth2, details2)
+        depth2 = self.structure_block2(token2, G[2], res1)
+        depth2 = self._refine(2, depth2)
         res2 = self.residual2(self.upsampler2(depth2))
 
-        # HUMMA Block 3
+        # Block 3 (H/4)
         token3 = self.stora3(features[1][0], patch_h, patch_w)
-        details3 = self.deatil_block3(token3, LHs[1], HLs[1], HHs[1])
-        depth3 = self.structure_block3(token3, LLs[1], res2)
-        depth3 = self.injectors3(depth3, details3)
+        depth3 = self.structure_block3(token3, G[1], res2)
+        depth3 = self._refine(3, depth3)
         res3 = self.residual3(self.upsampler3(depth3))
 
-        # HUMMA Block 4
+        # Block 4 (H/2): finest guide feature last
         token4 = self.stora4(features[0][0], patch_h, patch_w)
-        details4 = self.deatil_block4(token4, LHs[0], HLs[0], HHs[0])
-        depth4 = self.structure_block4(token4, LLs[0], res3)
-        depth4 = self.injectors4(depth4, details4)
+        depth4 = self.structure_block4(token4, G[0], res3)
+        depth4 = self._refine(4, depth4)
         res4 = self.final_upscale(depth4)
 
         # Boundary refinement
