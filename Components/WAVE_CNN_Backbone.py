@@ -129,11 +129,6 @@ class WAVE(nn.Module):
             
         )
 
-    def _refine(self, idx, x):
-        if not self.keep_refiner:
-            return x
-        return getattr(self, f"refiner{idx}")(x)
-
     def forward(self, image, depth):
         H = image.shape[-2] 
         W = image.shape[-1] 
@@ -150,25 +145,21 @@ class WAVE(nn.Module):
         # Block 1 (H/16): coarsest guide feature first
         token1 = self.stora1(features[3][0], patch_h, patch_w)
         depth1 = self.structure_block1(token1, G[3], depth0)
-        depth1 = self._refine(1, depth1)
         res1 = self.residual1(self.upsampler1(depth1))
 
         # Block 2 (H/8)
         token2 = self.stora2(features[2][0], patch_h, patch_w)
         depth2 = self.structure_block2(token2, G[2], res1)
-        depth2 = self._refine(2, depth2)
         res2 = self.residual2(self.upsampler2(depth2))
 
         # Block 3 (H/4)
         token3 = self.stora3(features[1][0], patch_h, patch_w)
         depth3 = self.structure_block3(token3, G[1], res2)
-        depth3 = self._refine(3, depth3)
         res3 = self.residual3(self.upsampler3(depth3))
 
         # Block 4 (H/2): finest guide feature last
         token4 = self.stora4(features[0][0], patch_h, patch_w)
         depth4 = self.structure_block4(token4, G[0], res3)
-        depth4 = self._refine(4, depth4)
         res4 = self.final_upscale(depth4)
 
         # Boundary refinement
