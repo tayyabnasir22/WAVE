@@ -6,6 +6,7 @@ import random
 
 class ExtendedSRImplicitDownSampled(SRDataProcessorBase):
     def __init__(self, rgb_path: str, depth_path: str, depth_norm_path: str, mask_path: str, min_max_path: str, patch_size: int, scale: int, repeat: int = 1, augment: bool = False, train: bool = False, token_size: int = None):
+        # Add mmap_mode='r' in case you have limited RAM
         self.depths = np.load(depth_path)#[:100]
         self.depths_norm = np.load(depth_norm_path)#[:100]
         self.images = np.load(rgb_path)#[:100]
@@ -27,12 +28,6 @@ class ExtendedSRImplicitDownSampled(SRDataProcessorBase):
         return img[:, i:i+patch_size, j:j+patch_size], gt[:, i:i+patch_size, j:j+patch_size], gt_norm[:, i:i+patch_size, j:j+patch_size], mask[:, i:i+patch_size, j:j+patch_size]
 
     def augment_data(self, img, gt, gt_norm, mask):
-        # RGB augmentation
-        if random.random() < 0.5:
-            img = TF.adjust_brightness(img, 1 + random.uniform(-0.1, 0.1))
-        if random.random() < 0.5:
-            img = TF.adjust_contrast(img, 1 + random.uniform(-0.1, 0.1))
-
         if random.random() < 0.5:
             # horizontal flip
             img = TF.hflip(img)
