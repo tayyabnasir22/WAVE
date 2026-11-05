@@ -109,16 +109,7 @@ class RealWorldTrainingHelper(TrainingHelperBase):
         
         for key, value in validation_metrics.items():
             log_info.append('Validation ' + key + '= {:.4f}'.format(value))
-        # Given RMSE 
-        if validation_metrics[self._pipeline.configurations.monitor_metric] <= validation_metric_seed:
-            ModelAttributesManager.SaveModel(
-                model, 
-                self._pipeline.optimizer, 
-                epoch, 
-                self._pipeline.configurations.save_path, 
-                SavedModelType.Best.value
-            )
-
+        
     def BenachmarkValidation(
         self,
         model, 
