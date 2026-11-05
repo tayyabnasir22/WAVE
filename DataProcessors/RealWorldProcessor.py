@@ -8,6 +8,7 @@ class RealWorldProcessor(SRDataProcessorBase):
     def __init__(self, rgb_path: str, depth_path: str, depth_norm_path: str, mask_path: str,
                  min_max_path: str, depth_lr_norm_path: str, repeat: int = 1, augment: bool = False,
                  train: bool = False):
+        # Add mmap_mode='r' in case you have limited RAM
         self.depths = np.load(depth_path)#[:10]
         self.depths_norm = np.load(depth_norm_path)#[:10]
         self.images = np.load(rgb_path)#[:10]
@@ -24,12 +25,6 @@ class RealWorldProcessor(SRDataProcessorBase):
         self.base_len = self.depths.shape[0]
 
     def augment_data(self, img, gt, gt_norm, mask, lr):
-        # RGB augmentation
-        if random.random() < 0.5:
-            img = TF.adjust_brightness(img, 1 + random.uniform(-0.1, 0.1))
-        if random.random() < 0.5:
-            img = TF.adjust_contrast(img, 1 + random.uniform(-0.1, 0.1))
-
         if random.random() < 0.5:
             # horizontal flip
             img = TF.hflip(img)
